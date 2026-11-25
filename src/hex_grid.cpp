@@ -3,6 +3,10 @@
 #include <cmath>
 #include <functional>
 #include <numbers>
+#include <ranges>
+
+namespace r = std::ranges;
+namespace rv = std::ranges::views;
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -71,4 +75,22 @@ std::array<jw::hex_coords, 6> jw::neighbors(const hex_coords& hex) {
     const auto [q, r] = hex;
     return {{{q + 1, r}, {q, r + 1}, {q - 1, r + 1},
              {q - 1, r}, {q, r - 1}, {q + 1, r - 1}}};
+}
+
+jw::hex_set jw::hex_grid_cells(int n) {
+    return rv::cartesian_product(
+        rv::iota(-n, n + 1),
+        rv::iota(-n, n + 1),
+        rv::iota(-n, n + 1)
+    ) | rv::filter(
+        [](auto triple)->bool {
+            auto [q, r, s] = triple;
+            return q + r + s == 0;
+        }
+    ) | rv::transform(
+        [](auto triple)->hex_coords {
+            auto [q, r, s] = triple;
+            return { q,r };
+        }
+    ) | r::to<hex_set>();
 }

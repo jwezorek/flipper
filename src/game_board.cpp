@@ -29,23 +29,16 @@ namespace {
         p.setBrush(Qt::white);
         p.setPen(QPen(Qt::black, 1.0));
 
-        for (int q = -sz; q <= sz; q++) {
-            for (int r = -sz; r <= sz; r++) {
-                for (int s = -sz; s <= sz; s++) {
-                    if (q + r + s != 0) {
-                        continue;
+        auto cells = jw::hex_grid_cells(sz);
+        for (const auto& hex : cells) {
+            p.drawPolygon(
+                jw::hexagon_vertices(hex, params) | rv::transform(
+                    [](const auto& pt)->QPointF {
+                        return { pt.x, pt.y };
                     }
-                    auto verts = jw::hexagon_vertices({ q,r }, params);
-                    QPolygonF poly = verts | rv::transform(
-                        [](const auto& pt)->QPointF {
-                            return { pt.x, pt.y };
-                        }
-                    ) | r::to<QPolygonF>();
-                    p.drawPolygon(poly);
-                }
-            }
+                ) | r::to<QPolygonF>()
+            );
         }
-
     }
 }
 

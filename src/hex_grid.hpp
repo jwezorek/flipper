@@ -56,5 +56,6 @@ namespace jw {
         const hex_coords& hex, const hex_grid_display_params& params
     );
     std::array<hex_coords, 6> neighbors(const hex_coords& hex);
+    hex_set hex_grid_cells(int sz);
 
 }
