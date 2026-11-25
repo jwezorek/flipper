@@ -17,6 +17,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(flipper
     src/main.cpp
     src/main_window.cpp
+    src/hex_grid.cpp
 )
 
 target_link_libraries(
