@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QWidget>
+#include <QElapsedTimer>
+#include <QTimer>
 #include <optional>
 #include "flipper.hpp"
 
@@ -13,11 +15,16 @@ namespace jw {
         Q_OBJECT
 
         std::optional<flipper_level> current_level_;
+        std::optional<hex_coords> cursor_cell_;
+
+        QTimer timer_;
+        QElapsedTimer elapsed_;
 
     public:
         explicit game_board(QWidget* parent = nullptr);
         void paintEvent(QPaintEvent*) override;
         void set(const flipper_level& lvl);
+        void tick();
     };
 
 
