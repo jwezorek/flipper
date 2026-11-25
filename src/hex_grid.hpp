@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 #include <unordered_set>
 #include <unordered_map>
@@ -45,6 +47,7 @@ namespace jw {
     template<typename T>
     using hex_map = std::unordered_map<hex_coords, T, hash_hex>;
 
+    using hex_grid = hex_map<int>;
 
     // returns the center of the hex in pixels...
     point hex_to_screen_loc(const hex_coords& hex, const hex_grid_display_params& params);

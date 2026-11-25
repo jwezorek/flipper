@@ -2,12 +2,16 @@
 
 #include <QMainWindow>
 #include <QString>
+#include "game_board.hpp"
 
 class QAction;
 
 /*------------------------------------------------------------------------------------------------*/
 
 namespace jw {
+
+    constexpr int k_board_wd = 1280;
+    constexpr int k_board_hgt = 720;
 
     class main_window : public QMainWindow {
         Q_OBJECT
@@ -18,7 +22,7 @@ namespace jw {
 
     private:
 
-        QWidget* board_;
+        game_board* board_;
     };
 
 } 

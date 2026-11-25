@@ -18,6 +18,8 @@ add_executable(flipper
     src/main.cpp
     src/main_window.cpp
     src/hex_grid.cpp
+    src/game_board.cpp
+    src/flipper.cpp
 )
 
 target_link_libraries(
