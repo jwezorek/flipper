@@ -14,6 +14,10 @@ namespace {
     const auto k_bkgd_color = QColor(172, 120, 186);
     const int k_board_sz = 4;
     const float k_cell_sz = 45.0f;
+    const int k_stamp_columns = 2;
+    const float k_marg_x = 45.0f;
+    const float k_marg_y = 30.0f;
+    const bool k_pointy_hexes = false;
 
     jw::point from_qt_point(const QPoint& p) {
         return {
@@ -27,7 +31,7 @@ namespace {
             static_cast<float>(jw::k_board_hgt) / 2.0f 
         },
         k_cell_sz,
-        false
+        k_pointy_hexes
     };
 
     bool is_on_hex_board(const jw::hex_coords& hex) {
@@ -37,14 +41,14 @@ namespace {
 
     QPolygonF cell_polygon(const jw::hex_coords& hex,
             const jw::hex_grid_display_params& params) {
-        return jw::hexagon_vertices(hex, k_params) | rv::transform(
+        return jw::hexagon_vertices(hex, params) | rv::transform(
             [](const auto& pt)->QPointF {
                 return { pt.x, pt.y };
             }
         ) | r::to<QPolygonF>();
     }
 
-    void draw_hex_grid(QPainter& p, int sz) {
+    void draw_hex_grid(QPainter& p, int sz, const jw::hex_grid_display_params& params) {
 
         p.setRenderHint(QPainter::Antialiasing);
         p.setBrush(Qt::white);
@@ -52,7 +56,34 @@ namespace {
 
         auto cells = jw::hex_grid_cells(sz);
         for (const auto& hex : cells) {
-            p.drawPolygon(cell_polygon(hex, k_params));
+            p.drawPolygon(cell_polygon(hex, params));
+        }
+    }
+
+    void draw_stamps(QPainter& p, const std::vector<jw::hex_grid>& stamps) {
+
+        auto n = static_cast<int>(stamps.size());
+        int rows = n / k_stamp_columns + (n % k_stamp_columns != 0);
+        auto left = jw::k_board_hgt + k_marg_x;
+        auto top = k_marg_y;
+        auto col_width = (jw::k_board_wd - left) / k_stamp_columns;
+        auto row_height = (jw::k_board_hgt - 2 * k_marg_y) / rows;
+        auto offset_x = col_width / 2.0f;
+        auto offset_y = row_height / 2.0f;
+
+        for (int i = 0; i < n; ++i) {
+            auto col = i % k_stamp_columns;
+            auto row = i / k_stamp_columns;
+            auto x = left + (col * col_width) + offset_x;
+            auto y = top + (row * row_height) + offset_y;
+
+            auto stamp_params = jw::hex_grid_display_params{
+                jw::point{ x, y },
+                30.0,
+                k_pointy_hexes
+            };
+
+            draw_hex_grid(p, 1, stamp_params);
         }
     }
 }
@@ -72,7 +103,12 @@ void jw::game_board::paintEvent(QPaintEvent*) {
     p.fillRect(rect(), k_bkgd_color);
     p.setRenderHint(QPainter::Antialiasing);
 
-    draw_hex_grid(p, k_board_sz);
+    draw_hex_grid(p, k_board_sz, k_params);
+    if (!current_level_) {
+        return;
+    }
+
+    draw_stamps(p, current_level_->stamps);
 
     if (cursor_cell_) {
         p.setBrush(Qt::gray);
