@@ -3,6 +3,7 @@
 #include "hex_grid.hpp"
 #include <qpainter.h>
 #include <ranges>
+#include <array>
 
 namespace r = std::ranges;
 namespace rv = std::ranges::views;
@@ -11,13 +12,20 @@ namespace rv = std::ranges::views;
 
 namespace {
 
-    const auto k_bkgd_color = QColor(172, 120, 186);
+    
     const int k_board_sz = 4;
     const float k_cell_sz = 45.0f;
     const int k_stamp_columns = 2;
     const float k_marg_x = 45.0f;
     const float k_marg_y = 30.0f;
     const bool k_pointy_hexes = false;
+
+    const auto k_palette = std::array<QColor, 3>{
+        QColor::fromString("#D7191C"),
+        QColor::fromString("#ABDDA4"),
+        QColor::fromString("#2B83BA")
+    };
+    const auto k_bkgd_color = QColor::fromString("#FDAE61");
 
     jw::point from_qt_point(const QPoint& p) {
         return {
@@ -48,9 +56,25 @@ namespace {
         ) | r::to<QPolygonF>();
     }
 
-    void paint_tiles(QPainter& p, const jw::hex_grid& hexes,
+    void paint_tiles(QPainter& p, const jw::hex_grid& tiles,
             const jw::hex_grid_display_params& params) {
-    
+
+        static std::vector<QBrush> palette;
+        if (palette.empty()) {
+            palette = k_palette | rv::transform(
+                [](const auto& color)->QBrush {
+                    return QBrush(color);
+                }
+            ) | r::to<std::vector>();
+        }
+
+        for (const auto& [loc, color] : tiles) {
+            if (color < 0 || color >= palette.size()) {
+                continue;
+            }
+            p.setBrush(palette[color]);
+            p.drawPolygon(cell_polygon(loc, params));
+        }
     }
 
     void paint_hex_grid(QPainter& p, const jw::hex_grid& tiles, int sz, 

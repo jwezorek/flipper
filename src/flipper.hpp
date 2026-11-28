@@ -7,6 +7,8 @@
 
 namespace jw {
 
+    constexpr int k_max_color_index = 2;
+
     struct flipper_level {
         hex_grid initial_configuration;
         hex_grid target;
@@ -24,6 +26,6 @@ namespace jw {
     };
 
     std::vector<flipper_level> from_json(const std::string& path);
-    void to_json(const std::vector<flipper_level>& level);
+    void to_json(const std::vector<flipper_level>& levels, const std::string& path);
 
 }

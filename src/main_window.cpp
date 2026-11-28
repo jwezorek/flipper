@@ -7,11 +7,7 @@ jw::main_window::main_window(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(tr("flipper"));
     board_->setFixedSize({ k_board_wd, k_board_hgt });
 
-    flipper_level lvl = {
-        .initial_configuration = {},
-        .target = {},
-        .stamps = std::vector<hex_grid>(4)
-    };
-    board_->set(lvl);
+    auto levels = jw::from_json("D:\\work\\flipper\\levels\\test.json");
+    board_->set(levels.front());
 }
 
