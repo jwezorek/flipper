@@ -48,7 +48,13 @@ namespace {
         ) | r::to<QPolygonF>();
     }
 
-    void draw_hex_grid(QPainter& p, int sz, const jw::hex_grid_display_params& params) {
+    void paint_tiles(QPainter& p, const jw::hex_grid& hexes,
+            const jw::hex_grid_display_params& params) {
+    
+    }
+
+    void paint_hex_grid(QPainter& p, const jw::hex_grid& tiles, int sz, 
+            const jw::hex_grid_display_params& params) {
 
         p.setRenderHint(QPainter::Antialiasing);
         p.setBrush(Qt::white);
@@ -58,6 +64,8 @@ namespace {
         for (const auto& hex : cells) {
             p.drawPolygon(cell_polygon(hex, params));
         }
+
+        paint_tiles(p, tiles, params);
     }
 
     void draw_stamps(QPainter& p, const std::vector<jw::hex_grid>& stamps) {
@@ -83,7 +91,7 @@ namespace {
                 k_pointy_hexes
             };
 
-            draw_hex_grid(p, 1, stamp_params);
+            paint_hex_grid(p, stamps.at(i), 1, stamp_params);
         }
     }
 }
@@ -102,13 +110,13 @@ void jw::game_board::paintEvent(QPaintEvent*) {
     QPainter p(this);
     p.fillRect(rect(), k_bkgd_color);
     p.setRenderHint(QPainter::Antialiasing);
-
-    draw_hex_grid(p, k_board_sz, k_params);
-    if (!current_level_) {
+    
+    if (!state_) {
         return;
     }
 
-    draw_stamps(p, current_level_->stamps);
+    paint_hex_grid(p, state_->state.current_tiles_, k_board_sz, k_params);
+    draw_stamps(p, state_->lvl_def.stamps);
 
     if (cursor_cell_) {
         p.setBrush(Qt::gray);
@@ -120,7 +128,13 @@ void jw::game_board::paintEvent(QPaintEvent*) {
 
 void jw::game_board::set(const flipper_level& lvl) {
 
-    current_level_ = lvl;
+    state_ = level_state{
+        lvl,
+        game_state {
+            lvl.initial_configuration,
+            std::nullopt
+        }
+    };
     update();
 
 }

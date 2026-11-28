@@ -14,7 +14,7 @@ namespace jw {
 
         Q_OBJECT
 
-        std::optional<flipper_level> current_level_;
+        std::optional<level_state> state_;
         std::optional<hex_coords> cursor_cell_;
 
         QTimer timer_;
